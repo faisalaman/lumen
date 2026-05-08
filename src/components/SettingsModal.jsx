@@ -28,7 +28,7 @@ export default function SettingsModal({ open, onClose }) {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -48,7 +48,7 @@ export default function SettingsModal({ open, onClose }) {
             <div className="mb-4 flex items-center justify-between">
               <h2
                 id="settings-title"
-                className="text-lg font-semibold text-slate-900 dark:text-slate-100"
+                className="text-lg font-semibold text-ink-1"
               >
                 Settings
               </h2>
@@ -76,8 +76,8 @@ export default function SettingsModal({ open, onClose }) {
                       }}
                       className={`flex-1 rounded-xl border px-3 py-2 text-sm capitalize transition ${
                         theme === opt
-                          ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-200'
-                          : 'border-slate-200 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800'
+                          ? 'border-line-2 bg-surface-2 text-ink-1'
+                          : 'border-line-1 text-ink-2 hover:bg-surface-1'
                       }`}
                     >
                       {opt}
@@ -115,7 +115,7 @@ export default function SettingsModal({ open, onClose }) {
                   <button
                     type="button"
                     onClick={() => setRevealToken((v) => !v)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-ink-3 hover:bg-surface-1"
                     aria-label={revealToken ? 'Hide token' : 'Show token'}
                   >
                     {revealToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -128,7 +128,7 @@ export default function SettingsModal({ open, onClose }) {
               <button onClick={onClose} className="btn-ghost">
                 Cancel
               </button>
-              <button onClick={handleSave} className="btn-primary">
+              <button onClick={handleSave} className="btn-gradient">
                 Save
               </button>
             </div>
@@ -142,11 +142,11 @@ export default function SettingsModal({ open, onClose }) {
 function Field({ label, hint, children }) {
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">
+      <label className="mb-1 block text-sm font-medium text-ink-2">
         {label}
       </label>
       {children}
-      {hint && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{hint}</p>}
+      {hint && <p className="mt-1 text-xs text-ink-3">{hint}</p>}
     </div>
   )
 }

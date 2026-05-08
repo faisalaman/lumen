@@ -64,7 +64,8 @@ export default function ChatWindow() {
       {!isPinned && (
         <button
           onClick={() => scrollToBottom()}
-          className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-full bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-card ring-1 ring-slate-200 transition hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-700 dark:hover:bg-slate-800"
+          className="chip absolute bottom-4 left-1/2 z-10 -translate-x-1/2 transition hover:-translate-y-0.5"
+          style={{ boxShadow: 'var(--lift)' }}
         >
           <span className="inline-flex items-center gap-1.5">
             <ArrowDown className="h-3.5 w-3.5" /> Jump to latest

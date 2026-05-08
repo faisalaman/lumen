@@ -24,7 +24,7 @@ function MessageBubble({ message, isLastAssistant, onRegenerate }) {
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 26 }}
       className={classNames(
         'group flex items-start gap-3 px-2 py-3',
         isUser && 'flex-row-reverse',
@@ -39,11 +39,23 @@ function MessageBubble({ message, isLastAssistant, onRegenerate }) {
       >
         <div
           className={classNames(
-            'rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm transition',
+            'px-4 py-3 text-sm leading-relaxed transition',
             isUser
-              ? 'rounded-tr-sm bg-brand-600 text-white'
-              : 'prose-chat rounded-tl-sm bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100',
+              ? 'text-white'
+              : 'prose-chat text-ink-1 border border-line-1',
           )}
+          style={
+            isUser
+              ? {
+                  borderRadius: '12px 12px 4px 12px',
+                  backgroundImage: 'var(--accent-grad)',
+                  boxShadow: 'var(--glow-sm)',
+                }
+              : {
+                  borderRadius: '12px 12px 12px 4px',
+                  background: 'var(--surface-1)',
+                }
+          }
         >
           {isUser ? (
             <span className="whitespace-pre-wrap break-words">{message.content}</span>
@@ -61,7 +73,7 @@ function MessageBubble({ message, isLastAssistant, onRegenerate }) {
               title="Copy"
             >
               {copied ? (
-                <Check className="h-4 w-4 text-emerald-500" />
+                <Check className="h-4 w-4 text-ok" />
               ) : (
                 <Copy className="h-4 w-4" />
               )}
@@ -88,11 +100,10 @@ function Avatar({ role }) {
   return (
     <div
       className={classNames(
-        'flex h-8 w-8 shrink-0 items-center justify-center rounded-xl',
-        isUser
-          ? 'bg-brand-600 text-white'
-          : 'bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300',
+        'flex h-8 w-8 shrink-0 items-center justify-center rounded-md',
+        isUser ? 'bg-surface-2 text-ink-1' : 'text-white',
       )}
+      style={isUser ? undefined : { backgroundImage: 'var(--accent-grad)', boxShadow: 'var(--glow-sm)' }}
       aria-hidden="true"
     >
       {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
@@ -105,8 +116,6 @@ function Markdown({ content }) {
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
-        // react-markdown v9 no longer passes `inline`; we infer it from the
-        // presence of a language class (fenced blocks set `language-*`).
         code({ className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || '')
           const codeString = String(children).replace(/\n$/, '')
@@ -136,12 +145,15 @@ function CodeBlock({ language, code }) {
     }
   }
   return (
-    <div className="group/code relative my-2">
-      <div className="flex items-center justify-between rounded-t-xl bg-slate-800 px-3 py-1.5 text-xs text-slate-300">
+    <div className="group/code relative my-2 overflow-hidden rounded-lg border border-line-2">
+      <div
+        className="flex items-center justify-between px-3 py-1.5 text-xs"
+        style={{ background: 'var(--surface-2)', color: 'var(--text-2)' }}
+      >
         <span className="font-mono uppercase tracking-wide">{language}</span>
         <button
           onClick={handleCopy}
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-slate-300 transition hover:bg-slate-700"
+          className="inline-flex items-center gap-1 rounded px-2 py-1 transition hover:bg-surface-2 hover:text-ink-1"
         >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
           {copied ? 'Copied' : 'Copy'}
@@ -153,12 +165,10 @@ function CodeBlock({ language, code }) {
         PreTag="div"
         customStyle={{
           margin: 0,
-          borderTopLeftRadius: 0,
-          borderTopRightRadius: 0,
-          borderBottomLeftRadius: '0.75rem',
-          borderBottomRightRadius: '0.75rem',
+          borderRadius: 0,
           padding: '0.85rem 1rem',
           fontSize: '0.85rem',
+          background: 'rgba(0,0,0,0.45)',
         }}
       >
         {code}

@@ -1,13 +1,27 @@
+import { useEffect, useState } from 'react'
 import { Menu, Moon, Sun, Trash2 } from 'lucide-react'
 import { useChat } from '../hooks/useChat.js'
 import { useTheme } from '../hooks/useTheme.js'
 import { MODELS } from '../utils/constants.js'
 import { formatTokens } from '../utils/formatters.js'
+import { getHealth, providerForModel } from '../services/healthService.js'
 
 export default function Header({ onToggleSidebar }) {
   const { theme, toggleTheme } = useTheme()
   const { activeChat, model, setModel, clearActiveChat } = useChat()
   const usage = activeChat?.tokenUsage
+
+  const [providers, setProviders] = useState(null)
+  useEffect(() => {
+    let alive = true
+    getHealth().then((h) => {
+      if (alive) setProviders(h.providers)
+    })
+    return () => { alive = false }
+  }, [])
+
+  const provider = providerForModel(model)
+  const isOnline = providers ? Boolean(providers[provider]) : null
 
   return (
     <header
@@ -27,7 +41,7 @@ export default function Header({ onToggleSidebar }) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <ModelSelector value={model} onChange={setModel} />
+        <ModelSelector value={model} onChange={setModel} status={isOnline} />
       </div>
 
       <div className="flex items-center gap-1">
@@ -65,17 +79,22 @@ export default function Header({ onToggleSidebar }) {
   )
 }
 
-function ModelSelector({ value, onChange }) {
-  // Static green dot placeholder — wired to live /api/health data in Task 14.
+function ModelSelector({ value, onChange, status }) {
+  const dotColor =
+    status === true ? 'var(--ok)' :
+    status === false ? 'var(--text-3)' :
+    'var(--text-3)' // unknown / loading — gray
+  const glow = status === true ? '0 0 6px rgba(34,197,94,.6)' : 'none'
   return (
     <label
       className="chip relative cursor-pointer pl-2 pr-7"
       style={{ paddingTop: 0, paddingBottom: 0, height: '32px' }}
+      title={status === true ? 'Provider reachable' : status === false ? 'Provider unreachable' : 'Checking…'}
     >
       <span className="sr-only">Model</span>
       <span
         className="inline-block h-1.5 w-1.5 rounded-full"
-        style={{ background: 'var(--ok)', boxShadow: '0 0 6px rgba(34,197,94,.6)' }}
+        style={{ background: dotColor, boxShadow: glow }}
         aria-hidden="true"
       />
       <select

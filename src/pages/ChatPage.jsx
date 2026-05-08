@@ -18,7 +18,7 @@ export default function ChatPage() {
   }, [sidebarOpen])
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="flex h-screen text-ink-1">
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}

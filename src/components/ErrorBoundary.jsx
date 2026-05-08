@@ -19,15 +19,15 @@ export default class ErrorBoundary extends Component {
   render() {
     if (this.state.error) {
       return (
-        <div className="flex h-full min-h-screen items-center justify-center bg-slate-50 p-6 dark:bg-slate-950">
+        <div className="flex h-full min-h-screen items-center justify-center bg-bg-deep p-6">
           <div className="card max-w-lg p-6 text-center">
-            <h1 className="mb-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
+            <h1 className="mb-2 text-lg font-semibold text-ink-1">
               Something went wrong
             </h1>
-            <p className="mb-4 text-sm text-slate-600 dark:text-slate-400">
+            <p className="mb-4 text-sm text-ink-2">
               {this.state.error.message ?? 'Unexpected error'}
             </p>
-            <button className="btn-primary" onClick={this.reset}>
+            <button className="btn-gradient" onClick={this.reset}>
               Try again
             </button>
           </div>

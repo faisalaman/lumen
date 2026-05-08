@@ -1,17 +1,11 @@
 import { useMemo } from 'react'
-import { AlertTriangle, ArrowDown, Bot, Sparkles } from 'lucide-react'
+import { AlertTriangle, ArrowDown } from 'lucide-react'
 import { useChat } from '../hooks/useChat.js'
 import { useAutoScroll } from '../hooks/useAutoScroll.js'
 import MessageBubble from './MessageBubble.jsx'
 import TypingIndicator from './TypingIndicator.jsx'
+import EmptyState from './EmptyState.jsx'
 import { MESSAGE_ROLES } from '../utils/constants.js'
-
-const SUGGESTIONS = [
-  { title: 'Explain a concept', subtitle: 'Explain quantum entanglement like I’m 12.' },
-  { title: 'Brainstorm ideas', subtitle: 'Give me 10 unusual mobile app ideas for runners.' },
-  { title: 'Code with me', subtitle: 'Write a debounce hook in TypeScript with tests.' },
-  { title: 'Summarize text', subtitle: 'Summarize the key risks of large language models.' },
-]
 
 export default function ChatWindow() {
   const { activeChat, isStreaming, regenerate, sendMessage, error, clearError } = useChat()
@@ -87,40 +81,6 @@ export default function ChatWindow() {
           </button>
         </div>
       )}
-    </div>
-  )
-}
-
-function EmptyState({ onPick }) {
-  return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col items-center justify-center gap-6 py-12 text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-card">
-        <Sparkles className="h-7 w-7" />
-      </span>
-      <div>
-        <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-          How can I help today?
-        </h2>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Ask anything — coding, writing, research, or just to brainstorm.
-        </p>
-      </div>
-      <ul className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
-        {SUGGESTIONS.map((s) => (
-          <li key={s.title}>
-            <button
-              onClick={() => onPick(s.subtitle)}
-              className="card flex w-full flex-col items-start gap-1 p-4 text-left transition hover:bg-slate-50 dark:hover:bg-slate-800"
-            >
-              <span className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
-                <Bot className="h-4 w-4 text-brand-600 dark:text-brand-300" />
-                {s.title}
-              </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">{s.subtitle}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   )
 }

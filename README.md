@@ -171,45 +171,66 @@ The frontend parses these in `src/services/chatService.js`.
 
 ## Production deployment
 
-### Frontend
-- `npm run build` produces a static `dist/` directory you can deploy to **Vercel**, **Netlify**, **Cloudflare Pages**, or any static host.
-- Set `VITE_API_BASE_URL` to your production API origin (e.g. `https://api.example.com/api`).
-- For SPA hosting on a CDN, configure a fallback to `index.html` for unknown routes.
+The frontend deploys to Vercel as static; the backend deploys to Render as a long-running Node service. Both connect to GitHub for auto-deploy on push to `main`.
 
-### Backend
-- Run with a process manager (e.g. `pm2`, `systemd`) or deploy to **Render**, **Railway**, **Fly.io**, **AWS ECS/Fargate**, or **Cloud Run**.
-- Required env vars: `JWT_SECRET`, at least one provider key, `CORS_ORIGIN` set to your frontend URL.
-- Put it behind a reverse proxy (nginx, Caddy, Cloudflare). Disable response buffering on the streaming route — for nginx:
-  ```nginx
-  location /api/chat/stream {
-    proxy_pass http://app;
-    proxy_buffering off;
-    proxy_cache off;
-    proxy_set_header Connection '';
-    proxy_http_version 1.1;
-    chunked_transfer_encoding on;
-  }
-  ```
-- Keep secrets in a secret manager (AWS Secrets Manager, Doppler, 1Password) — never in git.
-- Add observability: structured JSON logs, request IDs, metrics, error tracking (Sentry).
+### One-time setup
 
-### Security best practices
-- Rotate `JWT_SECRET` regularly; use short token lifetimes plus refresh tokens for long sessions.
-- Move JWTs into `httpOnly`, `Secure`, `SameSite=Strict` cookies for first-party apps.
-- Strict CORS allow-list — never `*` in production.
-- Provider keys live only on the backend. Never expose them via `VITE_*` envs.
-- Apply per-user rate limits (the example uses per-IP; switch to per-`user.id`).
-- Validate every request payload (this project uses `zod`).
-- Use Helmet (already wired) and add a strong CSP suited to your domain.
-- Cap message length and conversation depth to mitigate prompt-injection and abuse.
-- Log responses without their content; redact PII before sending to log sinks.
+#### A. Push to GitHub
 
-### Frontend best practices
-- Code-split heavy markdown / syntax highlighter chunks (already done via Vite `manualChunks`).
-- Memoize `MessageBubble` (already done) — long conversations stay smooth.
-- Keep the streaming reader cancelable via `AbortController` to avoid orphan requests on unmount.
-- Persist chats with a schema version (`aichat.chats.v1`) so future migrations are safe.
-- Avoid storing JWTs in `localStorage` for high-stakes apps — prefer cookie-based auth.
+```bash
+gh repo create <yourname>/lumen --public --source=. --push
+# or via the GitHub website: create an empty repo, then:
+git remote add origin git@github.com:<yourname>/lumen.git
+git push -u origin main
+```
+
+#### B. Deploy the backend to Render
+
+1. Sign in at https://dashboard.render.com → New → Blueprint.
+2. Connect the GitHub repo. Render reads `render.yaml` and provisions a `lumen-backend` service.
+3. After provisioning, set these env vars in the Render dashboard (Environment tab):
+   - `JWT_SECRET` — run `openssl rand -hex 32` and paste the output.
+   - `CORS_ORIGIN` — leave empty for now; you'll fill it in step C after Vercel gives you a URL.
+   - At least one of `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`.
+4. The first deploy starts automatically; takes ~3 minutes. Note the service URL: `https://lumen-backend.onrender.com` (your name will differ).
+5. Smoke-test:
+   ```bash
+   curl https://lumen-backend.onrender.com/api/health
+   ```
+   Expected JSON with `providers` flags reflecting which keys you set.
+
+> **Cold starts:** Render's free tier sleeps services after ~15 minutes idle. The first request after sleep wakes it (~30 s). Upgrade to the $7/mo Starter plan if cold starts are unacceptable.
+
+#### C. Deploy the frontend to Vercel
+
+1. Sign in at https://vercel.com → Add New → Project → import the same GitHub repo.
+2. Vercel detects Vite from `vercel.json`. Leave defaults.
+3. In the project's Environment Variables tab, set:
+   - `VITE_API_BASE_URL` = `https://lumen-backend.onrender.com/api`
+   - `VITE_DEFAULT_MODEL` = (any cloud model id you have a key for, e.g. `gpt-4.1`)
+   - `VITE_APP_NAME` = `Lumen`
+4. Deploy. Note the production URL: `https://lumen-<hash>.vercel.app` (or your custom domain).
+5. **Go back to Render → set `CORS_ORIGIN` to your Vercel URL** (the full origin, no trailing slash). Trigger a redeploy.
+
+#### D. Smoke test end-to-end
+
+Open the Vercel URL. Pick a cloud model (the local llama options will show a gray dot in production — that's expected; local Ollama can't be reached from Render). Send a message; verify:
+- Response streams in token-by-token.
+- Token usage chip updates in the header.
+- Code blocks render with syntax highlighting.
+
+### Local development still works
+
+`./dev.sh` is unchanged. Local development hits the local Express backend at `:8080`, which can talk to local Ollama at `:11434`. None of that changes when production is deployed.
+
+### Security checklist before going public
+
+- [ ] `JWT_SECRET` set in Render and rotated.
+- [ ] `CORS_ORIGIN` set to your real frontend origin (never `*`).
+- [ ] `RATE_LIMIT_PER_MIN` reasonable for your traffic.
+- [ ] Provider keys only in Render env (never committed, never exposed via `VITE_*`).
+- [ ] Body size cap and per-request validation already enforced by `zod` in routes — confirm.
+- [ ] If you intend to expose this to others, switch JWT auth from optional to required (set `JWT_SECRET` and don't leave it empty).
 
 ## Scripts
 

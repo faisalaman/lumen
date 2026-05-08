@@ -1,0 +1,30 @@
+# Render Blueprint — provisions the backend Web Service.
+# Reference: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: lumen-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Provider keys — set these manually in the Render dashboard.
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      # Required: where the frontend is served from (Vercel URL).
+      - key: CORS_ORIGIN
+        sync: false
+      # JWT secret. Generate with `openssl rand -hex 32`.
+      - key: JWT_SECRET
+        sync: false
+      # Optional: rate limit per-IP per minute.
+      - key: RATE_LIMIT_PER_MIN
+        value: "60"

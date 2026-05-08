@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(command -v ollama)",
+      "Bash(ollama --version)",
+      "Bash(curl -sS --max-time 2 http://localhost:11434/api/tags)",
+      "Bash(ollama list *)",
+      "Bash(curl -sS --max-time 30 http://localhost:11434/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"llama3.2\",\"messages\":[{\"role\":\"user\",\"content\":\"Say hi in 3 words.\"}]}')",
+      "Read(//Users/askfaisaloutlook.com/.claude/plugins/cache/superpowers-dev/superpowers/5.0.7/skills/brainstorming/**)",
+      "Bash(/Users/askfaisaloutlook.com/.claude/plugins/cache/superpowers-dev/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh --project-dir /Users/askfaisaloutlook.com/Documents/projects/agent/agentforapp)",
+      "Bash(ls /Users/askfaisaloutlook.com/.claude/plugins/cache/superpowers-dev/superpowers/5.0.7/skills/subagent-driven-development/)",
+      "Read(//Users/askfaisaloutlook.com/.claude/plugins/cache/superpowers-dev/superpowers/5.0.7/skills/subagent-driven-development/**)",
+      "Bash(git init *)",
+      "Bash(git config *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}

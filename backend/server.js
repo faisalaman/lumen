@@ -7,6 +7,7 @@ import compression from 'compression'
 import rateLimit from 'express-rate-limit'
 import chatRouter from './routes/chat.js'
 import authRouter from './routes/auth.js'
+import healthRouter from './routes/health.js'
 import { authMiddleware } from './middleware/auth.js'
 
 const app = express()
@@ -31,8 +32,7 @@ const limiter = rateLimit({
 })
 app.use('/api', limiter)
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok', uptime: process.uptime() }))
-
+app.use('/api/health', healthRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/chat', authMiddleware, chatRouter)
 

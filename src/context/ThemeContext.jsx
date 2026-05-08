@@ -4,10 +4,10 @@ import { STORAGE_KEYS } from '../utils/constants.js'
 const ThemeContext = createContext(null)
 
 function getInitialTheme() {
-  if (typeof window === 'undefined') return 'light'
+  if (typeof window === 'undefined') return 'dark'
   const stored = window.localStorage.getItem(STORAGE_KEYS.THEME)
   if (stored === 'light' || stored === 'dark') return stored
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return 'dark' // brand default
 }
 
 export function ThemeProvider({ children }) {

@@ -14,7 +14,7 @@ export const MESSAGE_ROLES = {
 
 export const DEFAULT_MODEL = import.meta.env.VITE_DEFAULT_MODEL || 'gpt-4.1'
 
-export const APP_NAME = import.meta.env.VITE_APP_NAME || 'AI Chatbot'
+export const APP_NAME = import.meta.env.VITE_APP_NAME || 'Lumen'
 
 /**
  * Available models. Each entry uses an `id` that the backend understands and

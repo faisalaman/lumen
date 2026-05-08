@@ -10,7 +10,15 @@ export default function Header({ onToggleSidebar }) {
   const usage = activeChat?.tokenUsage
 
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-slate-200 bg-white/80 px-3 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80 sm:px-6">
+    <header
+      className="sticky top-0 z-20 flex items-center justify-between gap-2 px-3 py-2 sm:px-6"
+      style={{
+        background: 'color-mix(in srgb, var(--bg-deep) 70%, transparent)',
+        borderBottom: '1px solid var(--border-1)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}
+    >
       <div className="flex items-center gap-2">
         <button
           onClick={onToggleSidebar}
@@ -25,7 +33,7 @@ export default function Header({ onToggleSidebar }) {
       <div className="flex items-center gap-1">
         {usage?.total > 0 && (
           <span
-            className="hidden rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300 sm:inline"
+            className="chip hidden sm:inline-flex"
             title={`Prompt ${usage.prompt} / Completion ${usage.completion}`}
           >
             {formatTokens(usage.total)} tokens
@@ -58,13 +66,23 @@ export default function Header({ onToggleSidebar }) {
 }
 
 function ModelSelector({ value, onChange }) {
+  // Static green dot placeholder — wired to live /api/health data in Task 14.
   return (
-    <label className="relative">
+    <label
+      className="chip relative cursor-pointer pl-2 pr-7"
+      style={{ paddingTop: 0, paddingBottom: 0, height: '32px' }}
+    >
       <span className="sr-only">Model</span>
+      <span
+        className="inline-block h-1.5 w-1.5 rounded-full"
+        style={{ background: 'var(--ok)', boxShadow: '0 0 6px rgba(34,197,94,.6)' }}
+        aria-hidden="true"
+      />
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="input-base appearance-none pr-8 text-sm font-medium"
+        className="appearance-none bg-transparent pr-1 text-xs font-medium text-ink-1 outline-none"
+        style={{ background: 'transparent' }}
       >
         {MODELS.map((m) => (
           <option key={m.id} value={m.id}>
@@ -74,7 +92,7 @@ function ModelSelector({ value, onChange }) {
       </select>
       <svg
         aria-hidden="true"
-        className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+        className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-3"
         viewBox="0 0 20 20"
         fill="currentColor"
       >

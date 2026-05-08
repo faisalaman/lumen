@@ -199,3 +199,11 @@ body {
 .prose-chat table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.875rem; }
 .prose-chat th, .prose-chat td { border: 1px solid var(--border-1); padding: 0.4rem 0.7rem; }
 .prose-chat h1, .prose-chat h2, .prose-chat h3 { margin: 1rem 0 0.5rem; font-weight: 600; letter-spacing: -0.01em; }
+
+/* Streaming token reveal — fade in newly-mounted elements while is-streaming. */
+.streaming-md.is-streaming > * {
+  animation: tokenFade 80ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .streaming-md.is-streaming > * { animation: none; }
+}

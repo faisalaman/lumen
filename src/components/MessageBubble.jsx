@@ -60,7 +60,21 @@ function MessageBubble({ message, isLastAssistant, onRegenerate }) {
           {isUser ? (
             <span className="whitespace-pre-wrap break-words">{message.content}</span>
           ) : (
-            <Markdown content={message.content} />
+            <div
+              className={classNames(
+                'streaming-md',
+                message.streaming && 'is-streaming',
+              )}
+            >
+              <Markdown content={message.content} />
+              {message.streaming && (
+                <span
+                  aria-hidden="true"
+                  className="ml-0.5 inline-block h-3 w-[2px] align-[-2px] animate-cursorBlink"
+                  style={{ background: 'var(--accent-2)' }}
+                />
+              )}
+            </div>
           )}
         </div>
 

@@ -9,26 +9,51 @@ export default {
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       colors: {
-        brand: {
-          50: '#eef4ff',
-          100: '#dae6ff',
-          200: '#bcd2ff',
-          300: '#8eb4ff',
-          400: '#5a8bff',
-          500: '#3563ff',
-          600: '#1f44f5',
-          700: '#1a35dd',
-          800: '#1c2eb3',
-          900: '#1e2d8c',
+        // Tokens map to CSS variables defined in src/index.css.
+        // Light values live on :root, dark values on html.dark.
+        bg: {
+          deep: 'var(--bg-deep)',
+          elev: 'var(--bg-elev)',
         },
+        surface: {
+          1: 'var(--surface-1)',
+          2: 'var(--surface-2)',
+          3: 'var(--surface-3)',
+        },
+        line: {
+          1: 'var(--border-1)',
+          2: 'var(--border-2)',
+        },
+        ink: {
+          1: 'var(--text-1)',
+          2: 'var(--text-2)',
+          3: 'var(--text-3)',
+        },
+        accent: {
+          violet: 'var(--accent-1)',
+          cyan: 'var(--accent-2)',
+        },
+        ok: 'var(--ok)',
+        warn: 'var(--warn)',
+        err: 'var(--err)',
+      },
+      backgroundImage: {
+        'accent-grad': 'var(--accent-grad)',
+        'accent-grad-soft': 'var(--accent-grad-soft)',
       },
       boxShadow: {
-        soft: '0 4px 20px rgba(15, 23, 42, 0.06)',
-        card: '0 8px 30px rgba(15, 23, 42, 0.08)',
+        'glow-sm': 'var(--glow-sm)',
+        'glow-md': 'var(--glow-md)',
+        lift: 'var(--lift)',
+        soft: 'var(--lift)', // legacy alias to ease migration
+        card: 'var(--lift)', // legacy alias
       },
       borderRadius: {
-        xl: '0.9rem',
-        '2xl': '1.25rem',
+        sm: '6px',
+        md: '8px',
+        lg: '10px',
+        xl: '14px',
+        '2xl': '18px',
       },
       keyframes: {
         bounceDot: {
@@ -39,10 +64,30 @@ export default {
           '0%': { opacity: '0', transform: 'translateY(4px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        tokenFade: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        haloPulse: {
+          '0%, 100%': { transform: 'scale(1)', opacity: '0.8' },
+          '50%': { transform: 'scale(1.08)', opacity: '0.3' },
+        },
+        orbDrift: {
+          '0%, 100%': { transform: 'translate(0,0)' },
+          '50%': { transform: 'translate(30px, 20px)' },
+        },
+        cursorBlink: {
+          '50%': { opacity: '0' },
+        },
       },
       animation: {
         bounceDot: 'bounceDot 1.2s infinite ease-in-out',
         fadeIn: 'fadeIn 0.25s ease-out both',
+        tokenFade: 'tokenFade 80ms ease-out both',
+        haloPulse: 'haloPulse 3s ease-in-out infinite',
+        orbDrift1: 'orbDrift 12s ease-in-out infinite',
+        orbDrift2: 'orbDrift 14s ease-in-out infinite reverse',
+        cursorBlink: 'cursorBlink 1s steps(2) infinite',
       },
     },
   },

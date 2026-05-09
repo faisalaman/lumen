@@ -25,7 +25,8 @@ export const MODELS = [
   { id: 'gpt-4.1-mini', label: 'GPT-4.1 Mini', provider: 'openai', tag: 'OpenAI' },
   { id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6', provider: 'anthropic', tag: 'Anthropic' },
   { id: 'claude-opus-4-6', label: 'Claude Opus 4.6', provider: 'anthropic', tag: 'Anthropic' },
-  { id: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro', provider: 'google', tag: 'Google' },
+  { id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', provider: 'google', tag: 'Google' },
+  { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', provider: 'google', tag: 'Google' },
   // Local Llama via Ollama / llama.cpp / LM Studio. Edit the id to match the
   // model name your local runner advertises (e.g. `ollama list`).
   { id: 'llama3.2', label: 'Llama 3.2 (local)', provider: 'llama', tag: 'Local' },

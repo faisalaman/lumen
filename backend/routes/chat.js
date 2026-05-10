@@ -15,9 +15,18 @@ function toHttpError(err) {
 
 const router = Router()
 
+const ContentPart = z.union([
+  z.object({ type: z.literal('text'), text: z.string() }),
+  z.object({
+    type: z.literal('image'),
+    mimeType: z.string().regex(/^image\//),
+    dataBase64: z.string(),
+  }),
+])
+
 const messageSchema = z.object({
   role: z.enum(['system', 'user', 'assistant']),
-  content: z.string().min(1).max(20000),
+  content: z.union([z.string().min(1).max(20000), z.array(ContentPart).min(1)]),
 })
 
 const bodySchema = z.object({

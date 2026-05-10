@@ -51,7 +51,7 @@ export async function callProvider(provider, { messages, model, temperature }) {
   if (provider === 'openai') {
     const r = await openai().chat.completions.create({
       model,
-      messages,
+      messages: messages.map((m) => ({ role: m.role, content: openaiContent(partsOf(m.content)) })),
       temperature: temperature ?? 0.7,
     })
     return {
@@ -67,7 +67,7 @@ export async function callProvider(provider, { messages, model, temperature }) {
       max_tokens: 4096,
       temperature: temperature ?? 0.7,
       system,
-      messages: msgs.map((m) => ({ role: m.role, content: m.content })),
+      messages: msgs.map((m) => ({ role: m.role, content: anthropicContent(partsOf(m.content)) })),
     })
     return {
       content: r.content?.map((c) => c.text || '').join('') ?? '',
@@ -84,9 +84,9 @@ export async function callProvider(provider, { messages, model, temperature }) {
     const { system, msgs } = splitSystem(messages)
     const r = await m.generateContent({
       systemInstruction: system,
-      contents: msgs.map((msg) => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }],
+      contents: msgs.map((m) => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: googleParts(partsOf(m.content)),
       })),
       generationConfig: { temperature: temperature ?? 0.7 },
     })
@@ -105,7 +105,7 @@ export async function callProvider(provider, { messages, model, temperature }) {
   if (provider === 'llama') {
     const r = await llama().chat.completions.create({
       model,
-      messages,
+      messages: messages.map((m) => ({ role: m.role, content: openaiContent(partsOf(m.content)) })),
       temperature: temperature ?? 0.7,
     })
     return {
@@ -122,7 +122,7 @@ export async function callProvider(provider, { messages, model, temperature }) {
 export async function streamProvider(provider, { messages, model, temperature }, { signal, onToken, onUsage }) {
   if (provider === 'openai') {
     const stream = await openai().chat.completions.create(
-      { model, messages, temperature: temperature ?? 0.7, stream: true, stream_options: { include_usage: true } },
+      { model, messages: messages.map((m) => ({ role: m.role, content: openaiContent(partsOf(m.content)) })), temperature: temperature ?? 0.7, stream: true, stream_options: { include_usage: true } },
       { signal },
     )
     for await (const part of stream) {
@@ -140,7 +140,7 @@ export async function streamProvider(provider, { messages, model, temperature },
         max_tokens: 4096,
         temperature: temperature ?? 0.7,
         system,
-        messages: msgs.map((m) => ({ role: m.role, content: m.content })),
+        messages: msgs.map((m) => ({ role: m.role, content: anthropicContent(partsOf(m.content)) })),
       },
       { signal },
     )
@@ -160,9 +160,9 @@ export async function streamProvider(provider, { messages, model, temperature },
     const { system, msgs } = splitSystem(messages)
     const r = await m.generateContentStream({
       systemInstruction: system,
-      contents: msgs.map((msg) => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }],
+      contents: msgs.map((m) => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: googleParts(partsOf(m.content)),
       })),
       generationConfig: { temperature: temperature ?? 0.7 },
     })
@@ -183,7 +183,7 @@ export async function streamProvider(provider, { messages, model, temperature },
   }
   if (provider === 'llama') {
     const stream = await llama().chat.completions.create(
-      { model, messages, temperature: temperature ?? 0.7, stream: true },
+      { model, messages: messages.map((m) => ({ role: m.role, content: openaiContent(partsOf(m.content)) })), temperature: temperature ?? 0.7, stream: true },
       { signal },
     )
     for await (const part of stream) {
@@ -216,6 +216,42 @@ function splitSystem(messages) {
   const systems = messages.filter((m) => m.role === 'system').map((m) => m.content)
   const msgs = messages.filter((m) => m.role !== 'system')
   return { system: systems.join('\n\n') || undefined, msgs }
+}
+
+function openaiContent(parts) {
+  if (parts.length === 1 && parts[0].type === 'text') return parts[0].text
+  return parts.map((p) => {
+    if (p.type === 'text') return { type: 'text', text: p.text }
+    if (p.type === 'image') {
+      return {
+        type: 'image_url',
+        image_url: { url: `data:${p.mimeType};base64,${p.dataBase64}` },
+      }
+    }
+    return null
+  }).filter(Boolean)
+}
+
+function anthropicContent(parts) {
+  if (parts.length === 1 && parts[0].type === 'text') return parts[0].text
+  return parts.map((p) => {
+    if (p.type === 'text') return { type: 'text', text: p.text }
+    if (p.type === 'image') {
+      return {
+        type: 'image',
+        source: { type: 'base64', media_type: p.mimeType, data: p.dataBase64 },
+      }
+    }
+    return null
+  }).filter(Boolean)
+}
+
+function googleParts(parts) {
+  return parts.map((p) => {
+    if (p.type === 'text') return { text: p.text }
+    if (p.type === 'image') return { inlineData: { mimeType: p.mimeType, data: p.dataBase64 } }
+    return null
+  }).filter(Boolean)
 }
 
 function httpError(status, message) {

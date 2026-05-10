@@ -1,4 +1,5 @@
-import { Plus, Settings as SettingsIcon, Sparkles, X } from 'lucide-react'
+import { Plus, Search, Settings as SettingsIcon, Sparkles, X } from 'lucide-react'
+import { useState } from 'react'
 import { useChat } from '../hooks/useChat.js'
 import ChatHistory from './ChatHistory.jsx'
 import { APP_NAME } from '../utils/constants.js'
@@ -6,6 +7,7 @@ import { classNames } from '../utils/helpers.js'
 
 export default function Sidebar({ open, onClose, onOpenSettings }) {
   const { newChat } = useChat()
+  const [query, setQuery] = useState('')
 
   return (
     <>
@@ -64,9 +66,34 @@ export default function Sidebar({ open, onClose, onOpenSettings }) {
           </button>
         </div>
 
+        {/* Search */}
+        <div className="px-3 pb-2">
+          <label className="relative block">
+            <span className="sr-only">Search conversations</span>
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-3" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search…"
+              className="input-base pl-8 pr-7 py-1.5 text-xs"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                className="absolute right-1.5 top-1/2 inline-flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded text-ink-3 hover:bg-surface-2 hover:text-ink-1"
+                aria-label="Clear search"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </label>
+        </div>
+
         {/* History list */}
         <div className="flex-1 min-h-0 overflow-y-auto px-1">
-          <ChatHistory onSelect={onClose} />
+          <ChatHistory onSelect={onClose} query={query} />
         </div>
 
         {/* Footer */}

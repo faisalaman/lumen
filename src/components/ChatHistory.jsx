@@ -3,18 +3,27 @@ import { Pencil, Trash2 } from 'lucide-react'
 import { useChat } from '../hooks/useChat.js'
 import { bucketByDate, formatRelativeShort } from '../utils/formatters.js'
 import { classNames } from '../utils/helpers.js'
+import { filterChats, highlight } from '../utils/searchChats.js'
 
-export default function ChatHistory({ onSelect }) {
+export default function ChatHistory({ onSelect, query = '' }) {
   const { chats, activeChatId, setActiveChatId, renameChat, deleteChat } = useChat()
   const [editingId, setEditingId] = useState(null)
   const [draftTitle, setDraftTitle] = useState('')
 
-  const buckets = bucketByDate(chats)
+  const filtered = filterChats(chats, query)
+  const buckets = bucketByDate(filtered)
 
   if (!chats.length) {
     return (
       <p className="px-4 py-6 text-center text-xs text-ink-3">
         No conversations yet
+      </p>
+    )
+  }
+  if (!filtered.length) {
+    return (
+      <p className="px-4 py-6 text-center text-xs text-ink-3">
+        No matches for "{query}"
       </p>
     )
   }
@@ -84,7 +93,11 @@ export default function ChatHistory({ onSelect }) {
                         }}
                         className="flex-1 truncate text-left text-xs"
                       >
-                        {chat.title || 'New chat'}
+                        {highlight(chat.title || 'New chat', query).map((seg, i) =>
+                          typeof seg === 'string'
+                            ? seg
+                            : <mark key={i} className="rounded bg-accent-cyan/20 text-ink-1">{seg.text}</mark>
+                        )}
                       </button>
                     )}
 

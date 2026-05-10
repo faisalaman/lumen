@@ -18,6 +18,7 @@ export async function sendChat(payload, { signal } = {}) {
  * @param {Object} options
  * @param {Array<{role:string,content:string}>} options.messages
  * @param {string} options.model
+ * @param {string} [options.systemPrompt]
  * @param {AbortSignal} [options.signal]
  * @param {(token: string) => void} [options.onToken]
  * @param {(usage: any) => void} [options.onUsage]
@@ -25,12 +26,17 @@ export async function sendChat(payload, { signal } = {}) {
 export async function streamChatCompletion({
   messages,
   model,
+  systemPrompt,
   signal,
   onToken,
   onUsage,
 }) {
+  const fullMessages = [
+    ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
+    ...messages,
+  ]
   const res = await streamFetch('/chat/stream', {
-    body: { messages, model, stream: true },
+    body: { messages: fullMessages, model, stream: true },
     signal,
   })
 

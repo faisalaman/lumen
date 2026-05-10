@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Menu, Moon, Sun, Trash2 } from 'lucide-react'
+import { Menu, Moon, Sparkles, Sun, Trash2 } from 'lucide-react'
 import { useChat } from '../hooks/useChat.js'
 import { useTheme } from '../hooks/useTheme.js'
 import { MODELS } from '../utils/constants.js'
 import { formatTokens } from '../utils/formatters.js'
 import { getHealth, providerForModel } from '../services/healthService.js'
+import SystemPromptModal from './SystemPromptModal.jsx'
 
 export default function Header({ onToggleSidebar }) {
   const { theme, toggleTheme } = useTheme()
@@ -22,6 +23,9 @@ export default function Header({ onToggleSidebar }) {
 
   const provider = providerForModel(model)
   const isOnline = providers ? Boolean(providers[provider]) : null
+
+  const [systemPromptOpen, setSystemPromptOpen] = useState(false)
+  const hasSystemPrompt = Boolean(activeChat?.systemPrompt)
 
   return (
     <header
@@ -45,6 +49,19 @@ export default function Header({ onToggleSidebar }) {
       </div>
 
       <div className="flex items-center gap-1">
+        <button
+          onClick={() => setSystemPromptOpen(true)}
+          className="btn-icon"
+          title={hasSystemPrompt ? 'Instructions active — click to edit' : 'Add instructions for this chat'}
+          aria-label="Edit chat instructions"
+          style={
+            hasSystemPrompt
+              ? { backgroundImage: 'var(--accent-grad)', color: 'white', boxShadow: 'var(--glow-sm)' }
+              : undefined
+          }
+        >
+          <Sparkles className="h-4 w-4" />
+        </button>
         {usage?.total > 0 && (
           <span
             className="chip hidden sm:inline-flex"
@@ -75,6 +92,7 @@ export default function Header({ onToggleSidebar }) {
           {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
       </div>
+      <SystemPromptModal open={systemPromptOpen} onClose={() => setSystemPromptOpen(false)} />
     </header>
   )
 }

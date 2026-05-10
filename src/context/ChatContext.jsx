@@ -200,6 +200,7 @@ export function ChatProvider({ children }) {
         await streamChatCompletion({
           messages: baseMessages.map((m) => ({ role: m.role, content: m.content })),
           model: activeChat.model,
+          systemPrompt: activeChat.systemPrompt || undefined,
           signal: controller.signal,
           onToken: (token) => {
             aggregated += token

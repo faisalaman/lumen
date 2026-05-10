@@ -13,6 +13,7 @@ const NEW_CHAT_TEMPLATE = () => ({
   model: DEFAULT_MODEL,
   messages: [],
   tokenUsage: { prompt: 0, completion: 0, total: 0 },
+  systemPrompt: null,
 })
 
 function loadChats() {
@@ -280,6 +281,11 @@ export function ChatProvider({ children }) {
     [chats, activeChat],
   )
 
+  const setSystemPrompt = useCallback((chatId, prompt) => {
+    const normalized = prompt && prompt.trim() ? prompt : null
+    updateChat(chatId, (c) => ({ ...c, systemPrompt: normalized }))
+  }, [updateChat])
+
   const setActiveModel = useCallback(
     (nextModel) => {
       setModel(nextModel)
@@ -309,6 +315,7 @@ export function ChatProvider({ children }) {
       exportChat,
       model,
       setModel: setActiveModel,
+      setSystemPrompt,
     }),
     [
       chats,
@@ -326,6 +333,7 @@ export function ChatProvider({ children }) {
       exportChat,
       model,
       setActiveModel,
+      setSystemPrompt,
     ],
   )
 

@@ -198,6 +198,20 @@ export async function streamProvider(provider, { messages, model, temperature },
 
 /* --------------------------------- Helpers -------------------------------- */
 
+/**
+ * Normalize a message's `content` to an array of parts.
+ * Strings become a single text part. Used by every provider mapper
+ * to handle the union shape uniformly.
+ */
+function partsOf(content) {
+  if (content == null) return []
+  if (typeof content === 'string') {
+    return content === '' ? [] : [{ type: 'text', text: content }]
+  }
+  if (Array.isArray(content)) return content
+  return []
+}
+
 function splitSystem(messages) {
   const systems = messages.filter((m) => m.role === 'system').map((m) => m.content)
   const msgs = messages.filter((m) => m.role !== 'system')

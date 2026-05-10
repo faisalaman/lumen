@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { Bot, Check, Copy, RefreshCw, User } from 'lucide-react'
 import { copyToClipboard, classNames } from '../utils/helpers.js'
 import { MESSAGE_ROLES } from '../utils/constants.js'
+import { partsOf, textOf } from '../utils/content.js'
 
 function MessageBubble({ message, isLastAssistant, onRegenerate }) {
   const [copied, setCopied] = useState(false)
@@ -58,7 +59,7 @@ function MessageBubble({ message, isLastAssistant, onRegenerate }) {
           }
         >
           {isUser ? (
-            <span className="whitespace-pre-wrap break-words">{message.content}</span>
+            <UserContent content={message.content} />
           ) : (
             <div
               className={classNames(
@@ -66,7 +67,7 @@ function MessageBubble({ message, isLastAssistant, onRegenerate }) {
                 message.streaming && 'is-streaming',
               )}
             >
-              <Markdown content={message.content} />
+              <Markdown content={textOf(message.content)} />
               {message.streaming && (
                 <span
                   aria-hidden="true"
@@ -187,6 +188,29 @@ function CodeBlock({ language, code }) {
       >
         {code}
       </SyntaxHighlighter>
+    </div>
+  )
+}
+
+function UserContent({ content }) {
+  const parts = partsOf(content)
+  const images = parts.filter((p) => p.type === 'image')
+  const text = parts.filter((p) => p.type === 'text').map((p) => p.text).join('')
+  return (
+    <div className="flex flex-col gap-2">
+      {images.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {images.map((img, i) => (
+            <img
+              key={i}
+              src={`data:${img.mimeType};base64,${img.dataBase64}`}
+              alt=""
+              className="max-h-40 max-w-[160px] rounded-md border border-white/10 object-cover"
+            />
+          ))}
+        </div>
+      )}
+      {text && <span className="whitespace-pre-wrap break-words">{text}</span>}
     </div>
   )
 }

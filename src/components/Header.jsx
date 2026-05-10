@@ -6,6 +6,8 @@ import { MODELS } from '../utils/constants.js'
 import { formatTokens } from '../utils/formatters.js'
 import { getHealth, providerForModel } from '../services/healthService.js'
 import SystemPromptModal from './SystemPromptModal.jsx'
+import { useCommandPalette } from './CommandPalette.jsx'
+import { modLabel } from '../hooks/useHotkeys.js'
 
 export default function Header({ onToggleSidebar }) {
   const { theme, toggleTheme } = useTheme()
@@ -27,6 +29,8 @@ export default function Header({ onToggleSidebar }) {
   const [systemPromptOpen, setSystemPromptOpen] = useState(false)
   const hasSystemPrompt = Boolean(activeChat?.systemPrompt)
 
+  const cmdK = useCommandPalette()
+
   return (
     <header
       className="sticky top-0 z-20 flex items-center justify-between gap-2 px-3 py-2 sm:px-6"
@@ -44,6 +48,15 @@ export default function Header({ onToggleSidebar }) {
           aria-label="Open sidebar"
         >
           <Menu className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          onClick={cmdK.open}
+          className="chip hidden cursor-pointer hover:border-line-2 sm:inline-flex"
+          title="Command palette"
+          aria-label="Open command palette"
+        >
+          <kbd className="font-mono">{modLabel()}K</kbd>
         </button>
         <ModelSelector value={model} onChange={setModel} status={isOnline} />
       </div>
